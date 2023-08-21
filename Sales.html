@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sales Report</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+        }
+        table {
+            border-collapse: collapse;
+            width: 100%;
+            margin-top: 20px;
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: center;
+        }
+        th {
+            background-color: #f2f2f2;
+        }
+    </style>
+</head>
+<body>
+    <h1>Sales Report</h1>
+    <table id="salesTable">
+        <tr>
+            <th>Date</th>
+            <th>Product</th>
+            <th>Quantity Sold</th>
+            <th>Revenue</th>
+        </tr>
+    </table>
+
+    <script>
+        async function fetchCSVData() {
+            const response = await fetch('your_sales_data.csv'); // Replace with your CSV file path
+            const data = await response.text();
+            return data;
+        }
+
+        async function populateTable() {
+            const csvData = await fetchCSVData();
+            const lines = csvData.split('\n');
+            const table = document.getElementById('salesTable');
+
+            for (let i = 1; i < lines.length; i++) {
+                const cells = lines[i].split(',');
+                if (cells.length === 4) {
+                    const newRow = table.insertRow();
+                    for (let j = 0; j < cells.length; j++) {
+                        const cell = newRow.insertCell();
+                        cell.textContent = cells[j];
+                    }
+                }
+            }
+        }
+
+        populateTable();
+    </script>
+</body>
+</html>
