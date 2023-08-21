@@ -35,6 +35,13 @@
         th {
             background-color: #f2f2f2;
         }
+           .increasing {
+            background-color: #b2ffb2; /* Light green */
+        }
+
+        .decreasing {
+            background-color: #ffb2b2; /* Light red */
+        }
     </style>
 </head>
 <body>
@@ -63,13 +70,24 @@
                 headerRow.appendChild(th);
             });
 
-            rows.forEach(rowData => {
+            rows.forEach((rowData, rowIndex) => {
                 const row = table.insertRow();
-                rowData.forEach(cellData => {
+                rowData.forEach((cellData, cellIndex) => {
                     const cell = row.insertCell();
                     cell.textContent = cellData;
+                    if (rowIndex > 1 && cellIndex > 0) { // Skip first two rows (Customer and Total sales), and first column (Customer Name)
+                        const trendClass = calculateTrend(rows[rowIndex - 1][cellIndex], cellData);
+                        cell.classList.add(trendClass);
+                    }
                 });
             });
+        }
+
+        function calculateTrend(previous, current) {
+            if (previous === '' || current === '') {
+                return '';
+            }
+            return parseFloat(current) > parseFloat(previous) ? 'increasing' : 'decreasing';
         }
 
         parseCSVData();
