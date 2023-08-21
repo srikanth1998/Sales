@@ -17,6 +17,13 @@
             justify-content: center;
             min-height: 100vh;
         }
+           .increasing {
+            background-color: #b2ffb2; /* Light green */
+        }
+
+        .decreasing {
+            background-color: #ffb2b2; /* Light red */
+        }
         h1 {
             margin-bottom: 20px;
             color: #333;
@@ -90,7 +97,26 @@
                 });
             });
         }
+function calculateTrend(previous, current) {
+    if (previous === '' || current === '') {
+        return '';
+    }
+    return parseFloat(current) > parseFloat(previous) ? 'increasing' : 'decreasing';
+}
 
+// Assuming you have a table with id 'salesTable'
+
+salesData.forEach((customerData, rowIndex) => {
+    const row = salesTable.insertRow();
+    Object.values(customerData).forEach((cellData, cellIndex) => {
+        const cell = row.insertCell();
+        cell.textContent = cellData;
+        if (rowIndex > 1 && cellIndex > 0) { // Skip first two rows (Customer and Total sales), and first column (Customer Name)
+            const trendClass = calculateTrend(customerData[Object.keys(customerData)[cellIndex - 1]], cellData);
+            cell.classList.add(trendClass);
+        }
+    });
+});
         parseCSVData();
     </script>
 </body>
