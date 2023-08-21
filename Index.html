@@ -59,8 +59,8 @@
         async function parseCSVData() {
             const csvData = await fetchCSVData();
             const lines = csvData.trim().split('\n');
-            const headers = lines[0].split('\t');
-            const rows = lines.slice(1).map(line => line.split('\t'));
+            const headers = lines[0].split(',');
+            const rows = lines.slice(1).map(line => line.split(','));
 
             const table = document.getElementById('salesTable');
             const headerRow = table.insertRow();
@@ -70,27 +70,18 @@
                 headerRow.appendChild(th);
             });
 
-            rows.forEach((rowData, rowIndex) => {
+            rows.forEach(rowData => {
                 const row = table.insertRow();
-                rowData.forEach((cellData, cellIndex) => {
+                rowData.forEach(cellData => {
                     const cell = row.insertCell();
                     cell.textContent = cellData;
-                    if (rowIndex > 1 && cellIndex > 0) { // Skip first two rows (Customer and Total sales), and first column (Customer Name)
-                        const trendClass = calculateTrend(rows[rowIndex - 1][cellIndex], cellData);
-                        cell.classList.add(trendClass);
-                    }
                 });
             });
         }
 
-        function calculateTrend(previous, current) {
-            if (previous === '' || current === '') {
-                return '';
-            }
-            return parseFloat(current) > parseFloat(previous) ? 'increasing' : 'decreasing';
-        }
-
         parseCSVData();
+
+        
     </script>
 </body>
 </html>
