@@ -5,56 +5,22 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Sales Report</title>
     <style>
-    
         body {
             font-family: Arial, sans-serif;
-            background-color: #f8f8f8;
-            margin: 0;
-            padding: 0;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            min-height: 100vh;
-        }
-        h1 {
-            margin-bottom: 20px;
-            color: #333;
         }
         table {
             border-collapse: collapse;
-            width: 80%;
+            width: 100%;
             margin-top: 20px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-            background-color: white;
         }
         th, td {
             border: 1px solid #ddd;
-            padding: 10px;
+            padding: 8px;
             text-align: center;
         }
         th {
             background-color: #f2f2f2;
         }
-        .report-header {
-            background-color: #0074D9;
-            color: white;
-            padding: 15px;
-            text-align: center;
-        }
-        .report-header h1 {
-            margin: 0;
-        }
-        .graphic {
-            display: flex;
-            justify-content: center;
-            margin-top: 20px;
-        }
-        .graphic img {
-            max-width: 100%;
-            height: auto;
-        }
- 
     </style>
 </head>
 <body>
@@ -64,13 +30,14 @@
 
     <script>
         async function fetchCSVData() {
-            const response = await fetch('sales.csv'); // Replace with your CSV file path
+            const response = await fetch('sales.csv'); 
             const data = await response.text();
             return data;
         }
 
-        function parseCSVData(data) {
-            const lines = data.trim().split('\n');
+        async function parseCSVData() {
+            const csvData = await fetchCSVData();
+            const lines = csvData.trim().split('\n');
             const headers = lines[0].split(',');
             const rows = lines.slice(1).map(line => line.split(','));
 
@@ -82,42 +49,16 @@
                 headerRow.appendChild(th);
             });
 
-            const salesData = [];
-
             rows.forEach(rowData => {
-                const customerData = {};
-                for (let i = 0; i < headers.length; i++) {
-                    customerData[headers[i]] = rowData[i];
-                }
-                salesData.push(customerData);
-            });
-
-            salesData.forEach((customerData, rowIndex) => {
                 const row = table.insertRow();
-                Object.values(customerData).forEach((cellData, cellIndex) => {
+                rowData.forEach(cellData => {
                     const cell = row.insertCell();
                     cell.textContent = cellData;
-                    if (rowIndex > 1 && cellIndex > 0) { // Skip first two rows (Customer and Total sales), and first column (Customer Name)
-                        const trendClass = calculateTrend(customerData[headers[cellIndex - 1]], cellData);
-                        cell.classList.add(trendClass);
-                    }
                 });
             });
         }
 
-        function calculateTrend(previous, current) {
-            if (previous === '' || current === '') {
-                return '';
-            }
-            return parseFloat(current) > parseFloat(previous) ? 'increasing' : 'decreasing';
-        }
-
-        async function initialize() {
-            const csvData = await fetchCSVData();
-            parseCSVData(csvData);
-        }
-
-        initialize();
+        parseCSVData();
     </script>
 </body>
 </html>
