@@ -4,8 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Sales Report</title>
-      
-      <style>
+    <style>
+    
         body {
             font-family: Arial, sans-serif;
             background-color: #f8f8f8;
@@ -16,13 +16,6 @@
             align-items: center;
             justify-content: center;
             min-height: 100vh;
-        }
-           .increasing {
-            background-color: #b2ffb2; /* Light green */
-        }
-
-        .decreasing {
-            background-color: #ffb2b2; /* Light red */
         }
         h1 {
             margin-bottom: 20px;
@@ -61,6 +54,7 @@
             max-width: 100%;
             height: auto;
         }
+ 
     </style>
 </head>
 <body>
@@ -70,14 +64,13 @@
 
     <script>
         async function fetchCSVData() {
-            const response = await fetch('Sales.csv'); 
+            const response = await fetch('your_sales_data.csv'); // Replace with your CSV file path
             const data = await response.text();
             return data;
         }
 
-        async function parseCSVData() {
-            const csvData = await fetchCSVData();
-            const lines = csvData.trim().split('\n');
+        function parseCSVData(data) {
+            const lines = data.trim().split('\n');
             const headers = lines[0].split(',');
             const rows = lines.slice(1).map(line => line.split(','));
 
@@ -89,35 +82,42 @@
                 headerRow.appendChild(th);
             });
 
+            const salesData = [];
+
             rows.forEach(rowData => {
+                const customerData = {};
+                for (let i = 0; i < headers.length; i++) {
+                    customerData[headers[i]] = rowData[i];
+                }
+                salesData.push(customerData);
+            });
+
+            salesData.forEach((customerData, rowIndex) => {
                 const row = table.insertRow();
-                rowData.forEach(cellData => {
+                Object.values(customerData).forEach((cellData, cellIndex) => {
                     const cell = row.insertCell();
                     cell.textContent = cellData;
+                    if (rowIndex > 1 && cellIndex > 0) { // Skip first two rows (Customer and Total sales), and first column (Customer Name)
+                        const trendClass = calculateTrend(customerData[headers[cellIndex - 1]], cellData);
+                        cell.classList.add(trendClass);
+                    }
                 });
             });
         }
-function calculateTrend(previous, current) {
-    if (previous === '' || current === '') {
-        return '';
-    }
-    return parseFloat(current) > parseFloat(previous) ? 'increasing' : 'decreasing';
-}
 
-// Assuming you have a table with id 'salesTable'
-
-salesData.forEach((customerData, rowIndex) => {
-    const row = salesTable.insertRow();
-    Object.values(customerData).forEach((cellData, cellIndex) => {
-        const cell = row.insertCell();
-        cell.textContent = cellData;
-        if (rowIndex > 1 && cellIndex > 0) { // Skip first two rows (Customer and Total sales), and first column (Customer Name)
-            const trendClass = calculateTrend(customerData[Object.keys(customerData)[cellIndex - 1]], cellData);
-            cell.classList.add(trendClass);
+        function calculateTrend(previous, current) {
+            if (previous === '' || current === '') {
+                return '';
+            }
+            return parseFloat(current) > parseFloat(previous) ? 'increasing' : 'decreasing';
         }
-    });
-});
-        parseCSVData();
+
+        async function initialize() {
+            const csvData = await fetchCSVData();
+            parseCSVData(csvData);
+        }
+
+        initialize();
     </script>
 </body>
 </html>
